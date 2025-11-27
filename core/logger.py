@@ -2,12 +2,12 @@ import logging
 from functools import wraps
 
 
-def setup_logging(level: int = logging.INFO) -> None:
+def setup_logging(level: int = logging.DEBUG) -> None:
     """
     Configuring logging for the application.
 
     Args:
-        level: Logging level (default: INFO)
+        level: Logging level (default: DEBUG)
     """
 
     logging.basicConfig(
@@ -49,10 +49,11 @@ def log(logger: logging.Logger = get_logger(__name__)):
                 func.__doc__.split("\n")[0].strip() if func.__doc__ else func.__name__
             )
 
-            logging.info(f"Start {doc_first_line} with args: {args}, kwargs: {kwargs}")
+            logging.debug(f"Start {doc_first_line} with args: {args}, kwargs: {kwargs}")
 
             try:
                 result = func(*args, **kwargs)
+                logging.debug(f"{func.__name__} returned: {result}")
                 return result
             except Exception as e:
                 logger.exception(f"Exception raised: {str(e)}")
