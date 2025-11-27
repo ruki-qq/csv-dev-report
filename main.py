@@ -1,4 +1,5 @@
 import sys
+from csv import Error as csv_Error
 from pathlib import Path
 
 from core import (
@@ -28,7 +29,7 @@ def main():
 
         try:
             print(reader.check_csv_file_valid)
-        except (FileNotFoundError, ValueError) as e:
+        except (FileNotFoundError, ValueError, csv_Error) as e:
             print(f"Error: {e}")
             sys.exit(1)
 
