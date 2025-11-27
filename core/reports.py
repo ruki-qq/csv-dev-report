@@ -59,7 +59,7 @@ class ReportRegistry(metaclass=ReportRegMeta):
 
         if report_name not in cls._reports:
             error_msg = (
-                f"Report '{report_name}' isn't found."
+                f"Report '{report_name}' isn't found. "
                 f"Available reports: {', '.join(cls._reports)}".rstrip()
             )
             raise ValueError(error_msg)
