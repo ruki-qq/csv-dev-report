@@ -1,5 +1,7 @@
+import inspect
 import logging
 from functools import wraps
+from typing import Optional, Callable
 
 
 def setup_logging(level: int = logging.DEBUG) -> None:
@@ -12,7 +14,7 @@ def setup_logging(level: int = logging.DEBUG) -> None:
 
     logging.basicConfig(
         level=level,
-        format="[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s",
+        format="[%(asctime)s.%(msecs)03d] %(levelname)-7s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
@@ -31,34 +33,68 @@ def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
 
 
-def log(logger: logging.Logger = get_logger(__name__)):
+def log(_func: Optional[Callable] = None, *, logger: Optional[logging.Logger] = None):
     """
     Decorating function for logging purposes.
 
+    Can be used with or without parameters:
+        @log
+        def func(): ...
+
+        @log()
+        def func(): ...
+
+        @log(logger=custom_logger)
+        def func(): ...
+
     Args:
-        logger: Logger instance
+        _func: Function to decorate
+        logger: Optional logger instance (default: module logger)
 
     Returns:
         Decorated function
     """
 
     def decorator_log(func):
+        func_file: str = inspect.getsourcefile(func) or "unknown"
+        func_module: str = func.__module__.split(".")[-1]
+
+        try:
+            func_line: int = inspect.getsourcelines(func)[1]
+        except (OSError, TypeError):
+            func_line = 0
+
         @wraps(func)
         def wrapper(*args, **kwargs):
-            doc_first_line = (
-                func.__doc__.split("\n")[0].strip() if func.__doc__ else func.__name__
-            )
+            nonlocal logger
+            if logger is None:
+                logger = get_logger(func.__module__)
 
-            logging.debug(f"Start {doc_first_line} with args: {args}, kwargs: {kwargs}")
+            docstring: str | None = func.__doc__
+            if docstring:
+                doc_first_line: str = docstring.split("\n")[0].strip()
+                if not doc_first_line:
+                    doc_first_line = docstring.split("\n")[1].strip()
+            else:
+                doc_first_line: str = func.__name__
+
+            func_identifier = f"{func_module}:{func_line} {func.__qualname__}"
+
+            logger.debug(f"[{func_identifier}] Start {doc_first_line}")
+            logger.debug(f"[{func_identifier}] args={args}, kwargs={kwargs}")
 
             try:
                 result = func(*args, **kwargs)
-                logging.debug(f"{func.__name__} returned: {result}")
+                logger.debug(f"[{func_identifier}] Completed successfully")
                 return result
             except Exception as e:
-                logger.exception(f"Exception raised: {str(e)}")
+                logger.exception(f"[{func_identifier}] Exception raised: {str(e)}")
                 raise e
 
         return wrapper
 
-    return decorator_log
+    if _func is None:
+        # When called with parameters: @log() or @log(logger=...)
+        return decorator_log
+    else:
+        return decorator_log(_func)
