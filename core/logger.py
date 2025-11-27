@@ -1,22 +1,54 @@
 import inspect
 import logging
 from functools import wraps
-from typing import Optional, Callable
+from pathlib import Path
+from typing import Callable, Optional
 
 
-def setup_logging(level: int = logging.DEBUG) -> None:
+def setup_logging(
+    level: int = logging.DEBUG,
+    log_to_file: bool = True,
+    log_to_console: bool = False,
+    log_dir: str = "logs",
+) -> None:
     """
     Configuring logging for the application.
 
     Args:
-        level: Logging level (default: DEBUG)
+        level: Logging level (default: DEBUG).
+        log_to_file: Whether to log to file (default: True).
+        log_to_console: Whether to log to console (default: False).
+        log_dir: Directory for log files (default: "logs").
     """
 
-    logging.basicConfig(
-        level=level,
-        format="[%(asctime)s.%(msecs)03d] %(levelname)-7s - %(message)s",
+    log_path = Path(log_dir)
+    log_path.mkdir(exist_ok=True)
+    formatter = logging.Formatter(
+        fmt="[%(asctime)s.%(msecs)03d] %(levelname)-7s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
+
+    root_logger.handlers = []
+
+    if log_to_file:
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_file = log_path / f"app_{timestamp}.log"
+
+        file_handler = logging.FileHandler(log_file, encoding="utf-8")
+        file_handler.setLevel(level)
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+
+    if log_to_console:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(level)
+        console_handler.setFormatter(formatter)
+        root_logger.addHandler(console_handler)
 
 
 def get_logger(name: str) -> logging.Logger:
