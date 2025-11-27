@@ -49,6 +49,14 @@ class TestCsvReader:
         with pt_raises(csv_Error, match="More or less columns"):
             _ = reader.check_csv_file_valid
 
+    def test_check_empty_value_in_row(self, empty_value_csv_file):
+        """Test that empty value in CSV file row raises csv.Error."""
+
+        reader = CsvReader(empty_value_csv_file)
+
+        with pt_raises(csv_Error, match="Empty value in row"):
+            _ = reader.check_csv_file_valid
+
     def test_load_csv_returns_list_of_dicts(self, valid_csv_file):
         reader = CsvReader(valid_csv_file)
         data = reader.load_csv

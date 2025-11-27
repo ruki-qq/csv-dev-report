@@ -46,6 +46,10 @@ class CsvReader:
                 if len(row) != header_count:
                     error_msg = f"More or less columns than headers in row: {row}"
                     raise csv.Error(error_msg)
+                for value in row:
+                    if not value:
+                        error_msg = f"Empty value in row: {row}"
+                        raise csv.Error(error_msg)
 
             return f"CSV file {self.file} is valid with {len(rows)} rows."
 

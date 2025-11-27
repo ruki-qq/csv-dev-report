@@ -74,7 +74,6 @@ def invalid_csv_file() -> Iterator[Path]:
 
     yield temp_path
 
-    # Cleanup
     temp_path.unlink()
 
 
@@ -88,7 +87,20 @@ def empty_csv_file() -> Iterator[Path]:
 
     yield temp_path
 
-    # Cleanup
+    temp_path.unlink()
+
+
+@pytest.fixture
+def empty_value_csv_file() -> Iterator[Path]:
+    """Creating a temporary CSV file with empty value in row for testing csv_tools."""
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("name,position,performance\n")
+        f.write("John,Developer,\n")
+        temp_path = Path(f.name)
+
+    yield temp_path
+
     temp_path.unlink()
 
 
@@ -102,7 +114,6 @@ def non_csv_file() -> Iterator[Path]:
 
     yield temp_path
 
-    # Cleanup
     temp_path.unlink()
 
 
