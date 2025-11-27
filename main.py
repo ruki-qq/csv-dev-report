@@ -46,7 +46,6 @@ def main():
 
     except ValueError as e:
         print(f"Error: {e}")
-        print(f"Available reports: {', '.join(ReportRegistry.available_reports)}")
         sys.exit(1)
 
 
