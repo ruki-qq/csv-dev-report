@@ -1,6 +1,6 @@
 from tabulate import tabulate
 
-from core import log
+from .logger import log
 
 
 @log

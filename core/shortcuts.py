@@ -1,6 +1,6 @@
 from typing import Any
 
-from core import log
+from .logger import log
 
 
 @log

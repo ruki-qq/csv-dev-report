@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 
-from core import log
+from .logger import log
 
 
 class CsvReader:
