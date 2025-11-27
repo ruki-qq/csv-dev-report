@@ -59,7 +59,7 @@ class CsvReader:
         """
 
         with open(self.file, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
+            reader = csv.DictReader(f, delimiter=self.delimiter)
             data = list(reader)
 
         return data
