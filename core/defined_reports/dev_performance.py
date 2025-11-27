@@ -26,9 +26,10 @@ class AveragePerformanceReport(BaseReport):
             position = developer["position"]
             performance = developer["performance"]
 
-            is_numeric(performance)
+            if not is_numeric(performance):
+                continue
 
-            performance = convert_to_number(performance["rating"])
+            performance = convert_to_number(performance)
             position_perf[position].append(performance)
 
         report_data = []
