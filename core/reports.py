@@ -39,7 +39,7 @@ class ReportRegMeta(type):
 class ReportRegistry(metaclass=ReportRegMeta):
     """Registry of available reports."""
 
-    _reports: dict["str", BaseReport] = {}
+    _reports: dict["str", type[BaseReport]] = {}
 
     @classmethod
     @log
@@ -68,7 +68,9 @@ class ReportRegistry(metaclass=ReportRegMeta):
 
     @classmethod
     @log
-    def register_report(cls, report_name: str, report_class: BaseReport) -> BaseReport:
+    def register_report(
+        cls, report_name: str, report_class: type[BaseReport]
+    ) -> type[BaseReport]:
         """
         Registering report class.
 
